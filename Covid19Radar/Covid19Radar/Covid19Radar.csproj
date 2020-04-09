@@ -12,6 +12,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Remove="Views\Dummy.xaml" />
+    <EmbeddedResource Remove="Views\DummyPage.xaml" />
+  </ItemGroup>
+  <ItemGroup>
     <EmbeddedResource Include="Images\AllowBle.png" />
     <EmbeddedResource Include="Images\Beaconnetwork.png" />
     <EmbeddedResource Include="Images\TopMainImg.png" />
@@ -29,8 +33,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Views\ConsentByUserPage %28コピー%29.xaml.cs" />
+    <Compile Remove="Views\DescriptionPage %28コピー%29.xaml.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Update="Views\BeaconPage.xaml.cs">
       <DependentUpon>BeaconPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\DemoPage.xaml.cs">
+      <DependentUpon>DemoPage.xaml</DependentUpon>
     </Compile>
     <Compile Update="Views\ExceptionPage.xaml.cs">
       <DependentUpon>ExceptionPage.xaml</DependentUpon>
