@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Covid19Radar.Model
+namespace Covid19Radar.Models
 {
-    public class UserData
+    class UserDataModel
     {
 
         /// <summary>
