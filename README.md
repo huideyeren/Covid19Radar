@@ -1,23 +1,43 @@
-# Covid19Radar(English / Japanese ver is below 日本語版は下にあります。)
+# Covid19Radar (English / Japanese ver is below)
+
+*This Application is UNDER DEVELOPEMNT!!*
+This app uses Bluetooth LE to get the contact logs of each other.  
+
+iOS Builstatus [![iOS Build status](https://build.appcenter.ms/v0.1/apps/9c268337-4db9-4bf4-be09-efaf16672c15/branches/master/badge)](https://appcenter.ms)
+
+Android Build status [![Android Build status](https://build.appcenter.ms/v0.1/apps/3dcdf5b5-da95-4d03-96a6-e6ed42de7e16/branches/master/badge)](https://appcenter.ms)
+
+## Thank you for Your Contribute !!!
+Currently, we are doing intensive sprints, mainly by core contributors.
+The repository is synced from Azure DevOps to master on Github.
+For this reason, tasks are centrally managed with AzureDevOps.
+If you want to be a core contributor, talk to me on Discord.
 
 Discord Channel
 https://discord.gg/e5hMm4h
 
-Acknowledgments and Contributor
-Noriko Matsumoto (Designer/Device iOS Lending)
-Kazuki Ota (Create Build pipeline on AppCenter)
-Taiki Yoshida (Power BI / Power Apps)
-Yasuaki Matsuda (Server side / Azure Fucntions)
-Tsuyoshi Ushio  (Server side / Azure Fucntions)
-Takeshi Sakurai (Client iOS)
-Fumiya Kume (Client Xamarin)
-Takayuki Hirose (Device Mac Lending)
-
-*This Application is UNDER DEVELOPEMNT!!*
-
-This app uses Bluetooth to get the contact logs of each other.  
-We are waiting for your contribution and pull request.
-
+## Acknowledgments and Contributor
+- Noriko Matsumoto (Designer/Device iOS Lending)
+- Kazuki Ota (Create Build pipeline on AppCenter)
+- Taiki Yoshida (Power BI / Power Apps)
+- Yasuaki Matsuda (Server side / Azure Fucntions)
+- Tsuyoshi Ushio  (Server side / Azure Fucntions)
+- Takeshi Sakurai (Client iOS)
+- Fumiya Kume (Client Xamarin)
+- Takayuki Hirose (Device Mac Lending)
+- Tomoaki Ueno (Medical Information and FieAdvisory)
+- Kristina Yasuda (Public Relations and Activity)
+- Takashi Takebayashi (Transrate)
+- Ben (Client side Xamarin / Xmariners)
+- Udara Alwis (Client side Xamarin / Xmariners)
+- Pedro Costa (Client side Xamarin / Xmariners)
+- Colin (Client side Xamarin / Xmariners)
+- Lohith (Client side Xamarin / Xmariners)
+- Chaminda (Client side Xamarin / Xmariners)
+- Yuya Yoshida (Public Relations and Activity)
+- Ryota Nakamura (Beta Tester's communication lead)
+- Takafumi Ochiai (Privacy policy development / Domestic and foreign law expert lawyer)
+ 
 ![App Description](img/AppDescription-en.jpg)
 
 ## How to install the app for tester
@@ -81,7 +101,7 @@ Password：Covid19Radar
 - [Noriko Matsumoto](https://twitter.com/nori790822) (Designer)
 
 ## Licensing
-Covid19Radar is licensed under the Apache License, Version 2.0. See
+Covid19Radar is licensed under the GNU Affero General Public License v3.0. See
 [LICENSE](./LICENSE) for the full
 license text.
 
@@ -95,6 +115,12 @@ license text.
 
 現時点では、Android同士のビーコン取得と画面遷移のみができており、以下の機能の実装が行われていません。
 コントリビューションとプルリクエストをお待ちしています。
+
+## コントリビューションについて
+コントリビューションをお考えいただき、誠にありがとうございます。
+現在、私たちはコアコントリビューターと共に、2週間程度の間、チケット管理も含め、集中スプリント体制を展開しています。
+リポジトリは現在Azure DevOpsからGithubのMasterにPush同期さて、Azure DevOpsで集中管理しています。
+もし、あなたがコアコントリビューターとして活動をされたい場合は、Discordで私に話しかけてください。
 
 ## テスト用にアプリをインストールするには
 
@@ -155,6 +181,6 @@ Password：Covid19Radar
 - [Noriko Matsumoto](https://twitter.com/nori790822) (Designer)
 
 ## ライセンス
-Covid19Radar is licensed under the Apache License, Version 2.0. See
+Covid19Radar is licensed under the GNU Affero General Public License v3.0. See
 [LICENSE](./LICENSE) for the full
 license text.

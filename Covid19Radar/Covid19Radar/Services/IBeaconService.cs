@@ -25,7 +25,7 @@ namespace Covid19Radar.Services
         /// Start Advertising Beacon
         /// </summary>
         /// <param name="beacons">Beacon List</param>
-        void StartAdvertising(UserData userData);
+        void StartAdvertising(UserDataModel userData);
 
         /// <summary>
         /// Stop Advertising Beacon
@@ -35,6 +35,6 @@ namespace Covid19Radar.Services
         /// <summary>
         /// Get beacon data model
         /// </summary>
-        Dictionary<string, BeaconDataModel> GetBeaconData();
+        List<BeaconDataModel> GetBeaconData();
     }
 }

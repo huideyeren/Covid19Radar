@@ -6,7 +6,6 @@ using Prism.Ioc;
 using Android.Runtime;
 using Android.Content;
 using Plugin.CurrentActivity;
-using Plugin.Permissions;
 using Covid19Radar.Model;
 using AltBeaconOrg.BoundBeacon;
 using System.Collections.Generic;
@@ -18,12 +17,14 @@ using Covid19Radar.Services;
 
 namespace Covid19Radar.Droid
 {
-    [Activity(Label = "Covid19Radar", Icon = "@mipmap/ic_launcher", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
+    [Activity(Label = "Covid19Radar", Icon = "@mipmap/ic_launcher", Theme = "@style/MainTheme.Splash", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
     public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity, IBeaconConsumer
     {
-        internal static MainActivity Instance { get; private set; }
+        public static MainActivity Instance { get; private set; }
+        public static SQLiteConnectionProvider sqliteConnectionProvider { get; private set; }
         protected override void OnCreate(Bundle bundle)
         {
+            base.SetTheme(Resource.Style.MainTheme);
             base.OnCreate(bundle);
 
             CrossCurrentActivity.Current.Init(this, bundle);
@@ -31,11 +32,13 @@ namespace Covid19Radar.Droid
             TabLayoutResource = Resource.Layout.Tabbar;
             ToolbarResource = Resource.Layout.Toolbar;
             Instance = this;
+            sqliteConnectionProvider = new SQLiteConnectionProvider();
+
             Xamarin.Essentials.Platform.Init(this, bundle);
             global::Xamarin.Forms.Forms.Init(this, bundle);
             LoadApplication(new App(new AndroidInitializer()));
-
         }
+
         protected override void OnNewIntent(Intent intent)
         {
             base.OnNewIntent(intent);
@@ -43,9 +46,8 @@ namespace Covid19Radar.Droid
 
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
         {
-            base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
             Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
-            PermissionsImplementation.Current.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+            base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
         }
 
 
@@ -53,20 +55,23 @@ namespace Covid19Radar.Droid
         {
             public void RegisterTypes(IContainerRegistry containerRegistry)
             {
-                BeaconService beaconService = new BeaconService();
                 containerRegistry.RegisterSingleton<IBeaconService,BeaconService>();
+
+                containerRegistry.RegisterInstance<SQLiteConnectionProvider>(MainActivity.sqliteConnectionProvider);
             }
         }
 
-
         public void OnBeaconServiceConnect()
         {
-            /*
             BeaconService beaconService = Xamarin.Forms.DependencyService.Get<BeaconService>();
-
+            UserDataService userDataService = new UserDataService();
             beaconService.StartBeacon();
-            beaconService.StartAdvertising();
-            */
+
+            if (userDataService.IsExistUserData())
+            {
+                UserDataModel userDataModel = userDataService.Get();
+                beaconService.StartAdvertising(userDataModel);
+            }
         }
 
     }

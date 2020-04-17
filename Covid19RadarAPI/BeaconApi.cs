@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -9,59 +9,107 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Covid19Radar.Models;
 using Covid19Radar.DataStore;
+using Microsoft.Azure.Cosmos;
 
 namespace Covid19Radar.Api
 {
     public class BeaconApi
     {
 
-        private ICosmos _cosmos;
+        private ICosmos Cosmos;
+        private ILogger<BeaconApi> Logger;
 
-        public BeaconApi(ICosmos cosmos)
+        public BeaconApi(ICosmos cosmos, ILogger<BeaconApi> logger)
         {
-            _cosmos = cosmos;
+            Cosmos = cosmos;
+            Logger = logger;
         }
 
         [FunctionName("Beacon")]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
-            ILogger log)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
+            Logger.LogInformation($"{nameof(BeaconApi)} processed a request.");
 
             switch (req.Method)
             {
                 case "POST":
-                    return await Post(req, log);
-                case "GET":
-                    return await Get(req, log);
+                    return await Post(req);
             }
-
-            return  new BadRequestObjectResult("Please pass a name on the query string or in the request body");
+            AddBadRequest(req);
+            return new BadRequestObjectResult("Not Supported");
         }
 
-        private async Task<IActionResult> Get(HttpRequest req, ILogger log)
-        {
-            // get name from query 
-            string name = req.Query["name"];
-
-            // get BeaconDataModel from DB
-            await Task.CompletedTask;
-            var result = new BeaconDataModel();
-
-            return (ActionResult)new OkObjectResult(result);
-        }
-
-        private async Task<IActionResult> Post(HttpRequest req, ILogger log)
+        private async Task<IActionResult> Post(HttpRequest req)
         {
             // convert Postdata to BeaconDataModel
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            var data = JsonConvert.DeserializeObject<BeaconDataModel>(requestBody);
+            var param = JsonConvert.DeserializeObject<BeaconParameter>(requestBody);
+
+            // validation
+            if (string.IsNullOrWhiteSpace(param.UserUuid)
+                || string.IsNullOrWhiteSpace(param.Major)
+                || string.IsNullOrWhiteSpace(param.Minor))
+            {
+                AddBadRequest(req);
+                return new BadRequestObjectResult("");
+            }
+            var queryResult = await Query(req, param);
+            if (queryResult != null)
+            {
+                return queryResult;
+            }
 
             // save to DB
-            await Task.CompletedTask;
-            var result = new ResultModel();
-            return (ActionResult)new OkObjectResult(ResultModel.Success);
+            return await Add(param);
+        }
+
+        private async Task<IActionResult> Query(HttpRequest req, IUser user)
+        {
+            try
+            {
+                var itemResult = await Cosmos.User.ReadItemAsync<UserResultModel>(user.GetId(), PartitionKey.None);
+                if (itemResult.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    return null;
+                }
+            }
+            catch (CosmosException ex)
+            {
+                // 429-TooManyRequests
+                if (ex.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
+                {
+                    return new StatusCodeResult(503);
+                }
+            }
+            AddBadRequest(req);
+            return new BadRequestObjectResult("");
+        }
+
+        private async Task<IActionResult> Add(BeaconParameter param)
+        {
+            var data = new BeaconModel();
+            data.id = Guid.NewGuid().ToString("N") + DateTime.UtcNow.Ticks;
+            data.UserUuid = param.UserUuid;
+            data.UserMajor = param.UserMajor;
+            data.UserMinor = param.UserMinor;
+            data.BeaconUuid = param.BeaconUuid;
+            data.Count = param.Count;
+            data.Distance = param.Distance;
+            data.ElaspedTime = param.ElaspedTime;
+            data.LastDetectTime = param.LastDetectTime;
+            data.Major = param.Major;
+            data.Minor = param.Minor;
+            data.Rssi = param.Rssi;
+            data.TXPower = param.TXPower;
+            data.TimeStamp = DateTime.UtcNow;
+            var result = await Cosmos.Beacon.CreateItemAsync(data);
+            return new StatusCodeResult(201);
+        }
+
+        private void AddBadRequest(HttpRequest req)
+        {
+            // add deny list
         }
     }
 }

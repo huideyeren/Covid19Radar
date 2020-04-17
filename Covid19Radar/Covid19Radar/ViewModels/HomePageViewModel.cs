@@ -1,25 +1,59 @@
-﻿using Prism.Commands;
-using Prism.Mvvm;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
+using Covid19Radar.Model;
+using Covid19Radar.Resx;
 using Prism.Navigation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Xamarin.Forms;
-using System.Windows.Input;
 
 namespace Covid19Radar.ViewModels
 {
-    public class HomePageViewModel : ViewModelBase
+    public class HomePageViewModel : ViewModelBase, INotifyPropertyChanged
     {
-        private INavigationService _navigationService;
+        public List<HomeMenuModel> HomeMenus { get; private set; }
 
         public HomePageViewModel(INavigationService navigationService)
             : base(navigationService)
         {
-            _navigationService = navigationService;
-
-            Title = "Home";
+            Title = AppResources.HomeTitle;
+            SetData();
         }
+
+        private void SetData()
+        {
+            HomeMenus = new List<HomeMenuModel>
+            {
+                new HomeMenuModel
+                {
+                    Title=AppResources.StatusSettingsMenu,
+                    Command=OnClickUserSetting,
+                },
+                new HomeMenuModel
+                {
+                    Title=AppResources.ListOfContributorsMenu,
+                    Command=OnClickAcknowledgments
+                },
+                new HomeMenuModel
+                {
+                    Title=AppResources.UpdateInformationMenu,
+                    Command=OnClickUpateInfo
+                }
+            };
+        }
+
+        public Command OnClickUserSetting => new Command(() =>
+        {
+            NavigationService.NavigateAsync("UserSettingPage");
+        });
+        public Command OnClickAcknowledgments => new Command(() =>
+        {
+            NavigationService.NavigateAsync("ContributersPage");
+        });
+
+        public Command OnClickUpateInfo => new Command(() =>
+        {
+            NavigationService.NavigateAsync("UpdateInfoPage");
+        });
+
+
     }
 }

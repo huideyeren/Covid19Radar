@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -9,60 +9,85 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Covid19Radar.Models;
 using Covid19Radar.DataStore;
+using Microsoft.Azure.Cosmos;
 
 namespace Covid19Radar.Api
 {
     public class UserApi
     {
 
-        private ICosmos _Cosmos;
+        private readonly ICosmos Cosmos;
+        private readonly ILogger<UserApi> Logger;
 
-        public UserApi(ICosmos cosmos)
+        public UserApi(ICosmos cosmos, ILogger<UserApi> logger)
         {
-            _Cosmos = cosmos;
+            Cosmos = cosmos;
+            Logger = logger;
         }
 
 
         [FunctionName("User")]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
-            ILogger log)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
+            Logger.LogInformation("C# HTTP trigger function processed a request.");
 
             switch (req.Method)
             {
                 case "POST":
-                    return await Post(req, log);
-                case "GET":
-                    return await Get(req, log);
+                    return await Post(req);
             }
 
-            return  new BadRequestObjectResult("Please pass a name on the query string or in the request body");
+            AddBadRequest(req);
+            return new BadRequestObjectResult("");
         }
 
-        private async Task<IActionResult> Get(HttpRequest req, ILogger log)
+        private async Task<IActionResult> Post(HttpRequest req)
         {
-            // get name from query 
-            string name = req.Query["name"];
-
-            // get UserData from DB
-            await Task.CompletedTask;
-            var result = new UserDataModel();
-
-            return (ActionResult)new OkObjectResult(result);
-        }
-
-        private async Task<IActionResult> Post(HttpRequest req, ILogger log)
-        {
-            // convert Postdata to UserDataModel
+            // convert Postdata to BeaconDataModel
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            var data = JsonConvert.DeserializeObject<UserDataModel>(requestBody);
+            var user = JsonConvert.DeserializeObject<UserParameter>(requestBody);
 
-            // save to DB
-            await Task.CompletedTask;
-            var result = new ResultModel();
-            return (ActionResult)new OkObjectResult(ResultModel.Success);
+            // validation
+            if (string.IsNullOrWhiteSpace(user.UserUuid)
+                || string.IsNullOrWhiteSpace(user.Major)
+                || string.IsNullOrWhiteSpace(user.Minor))
+            {
+                AddBadRequest(req);
+                return new BadRequestObjectResult("");
+            }
+
+            // query
+            return await Query(req, user);
+        }
+
+        private async Task<IActionResult> Query(HttpRequest req, UserParameter user)
+        {
+            try
+            {
+                var itemResult = await Cosmos.User.ReadItemAsync<UserResultModel>(user.GetId(), PartitionKey.None);
+                if (itemResult.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    return new OkObjectResult(itemResult.Resource);
+                }
+            }
+            catch (CosmosException ex)
+            {
+                // 429–TooManyRequests
+                if (ex.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
+                {
+                    return new StatusCodeResult(503);
+                }
+                AddBadRequest(req);
+                return new StatusCodeResult((int)ex.StatusCode);
+            }
+            AddBadRequest(req);
+            return new NotFoundResult();
+        }
+
+        private void AddBadRequest(HttpRequest req)
+        {
+            // add deny list
         }
     }
 }

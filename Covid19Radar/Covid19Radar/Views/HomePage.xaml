@@ -1,18 +1,35 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d"
-                          xmlns:local="clr-namespace:Covid19Radar"
-             x:Class="Covid19Radar.ViewModels.HomePage"
-            Title="{Binding Title}">
+<ContentPage
+    x:Class="Covid19Radar.Views.HomePage"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:resources="clr-namespace:Covid19Radar.Resx;assembly=Covid19Radar"
+    Title="{Binding Title}"
+    Padding="80,20"
+    Style="{StaticResource PageStyle}">
 
-    <ContentPage.ToolbarItems>
-    </ContentPage.ToolbarItems>
-
-    <ContentPage.Content>
-        <StackLayout>
+    <StackLayout VerticalOptions="Center">
+        <Image HorizontalOptions="Center" Source="Logo.png" />
+        <Label
+            Margin="0,29,0,60"
+            FontFamily="{StaticResource NotoSansMediumFontFamily}"
+            FontSize="22"
+            HorizontalOptions="Center"
+            Text="{x:Static resources:AppResources.AppName}"
+            TextColor="{StaticResource Accent4Color}" />
+        <StackLayout
+            Grid.Row="1"
+            BindableLayout.ItemsSource="{Binding HomeMenus}"
+            Spacing="28"
+            VerticalOptions="Center">
+            <BindableLayout.ItemTemplate>
+                <DataTemplate>
+                    <Button
+                        Command="{Binding Command}"
+                        Style="{StaticResource BaseButtonStyle}"
+                        Text="{Binding Title}" />
+                </DataTemplate>
+            </BindableLayout.ItemTemplate>
         </StackLayout>
-    </ContentPage.Content>
+    </StackLayout>
 </ContentPage>
