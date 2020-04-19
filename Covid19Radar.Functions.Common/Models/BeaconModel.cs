@@ -27,6 +27,10 @@ namespace Covid19Radar.Models
         /// <value>BLE minor number</value>
         public string UserMinor { get; set; }
         /// <summary>
+        /// 
+        /// </summary>
+        public int Count { get; set; }
+        /// <summary>
         /// Same beacon uuid's device can communication.
         /// </summary>
         /// <value>BeaconUuid</value>
@@ -64,12 +68,20 @@ namespace Covid19Radar.Models
         /// </summary>
         public DateTime LastDetectTime { get; set; }
         /// <summary>
-        /// 
+        /// The first time measured.
         /// </summary>
-        public int Count { get; set; }
+        public DateTime FirstDetectTime { get; set; }
+        /// <summary>
+        /// The splited timespan.
+        /// </summary>
+        public string KeyTime { get; set; }
         /// <summary>
         /// created timestamp UTC
         /// </summary>
         public DateTime TimeStamp { get; set; }
+        /// <summary>
+        /// PartitionKey
+        /// </summary>
+        public string PartitionKey { get; set; }
     }
 }
